@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DashBoard - Pesquisa</title>
+    <link rel="stylesheet" href="TesteMenu.css">
+    <link rel="shortcut icon" href="../img/Logo FreezeWay logo branca sem fundo.png" type="image/x-icon">
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <script src="../js/sessao.js"></script>
+
+    <!-- <link rel="stylesheet" href="PesquisaPi.css"> -->
+</head>
+
+<body style="margin-top: 0px;">
+
+    <div class="navigation">
+        <ul>
+            <li class="list">
+                <span class="title"
+                    style="color: skyblue; font-size: x-large; text-align: center;padding-left: 70px;">FreezeWay</span>
+            </li>
+            <li>
+                <span class="title"
+                    style="color: white; font-size: large; text-align: center;padding-left: 70px;">Olá,&nbsp;&nbsp;<span
+                        id="b_usuario">Usuário</span>!</span>
+            </li><br>
+            <li class="list active">
+                <a href="...\FreezeWay\Sprint2\DashboardFinal\DashPesquisa.html">
+                    <span class="icon"><ion-icon name="search-outline"></ion-icon></span>
+                    <span class="title">Pesquisa</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashFinal.html">
+                    <span class="icon"><ion-icon name="thermometer-outline"></ion-icon></span>
+                    <span class="title">Temperatura Atual</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashTemSemanal.html">
+                    <span class="icon"> <ion-icon name="stats-chart-outline"></ion-icon></span>
+                    <span class="title">Temperatura Semanal</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashTempAnual.html">
+                    <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+                    <span class="title">Temperatura Mensal</span>
+                </a>
+            <li class="list">
+                <a href="DashCadastroCaminhao.html">
+                    <span class="icon"><ion-icon name="duplicate-outline"></ion-icon></span>
+                    <span class="title">Cadastrar Caminhão</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="../LoginN3.html">
+                    <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+                    <span class="title">FreezeIA</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                    <span class="title"><button class="logout" onclick="limparSessao()"> Sair</button></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div id="body">
+        <h1>Caminhões</h1>
+        <table id="orcamentos-table">
+            <thead>
+                <tr>
+                    <th>Identificador Caminhão</th>
+                    <th>Nome Motorista</th>
+                    <th>Dia</th>
+                    <th>Temperatura Média</th>
+                    <th>Produto</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+
+    <script>
+
+        var idUsuario = sessionStorage.ID_USUARIO;
+
+        document.addEventListener('DOMContentLoaded', function () {
+    b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+
+    fetch(`/Caminhao/buscarCaminhoes/${idUsuario}`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json"
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data); 
+        const tbody = document.querySelector('#orcamentos-table tbody');
+        tbody.innerHTML = ''; 
+
+        if (data.length === 0) {
+            const row = document.createElement('tr');
+            const cell = document.createElement('td');
+            cell.colSpan = 5; 
+            cell.textContent = 'Nenhum Registro de Caminhão encontrado.';
+            row.appendChild(cell);
+            tbody.appendChild(row);
+        } else {
+            data.forEach(item => {
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                    <td>${item.idCaminhao}</td>
+                    <td>${item.motorista}</td>
+                    <td>${formatDate(item.dtDadosMedidas)}</td>
+                    <td>${item.temperatura}°</td>
+                    <td>${item.nomeProduto}</td>
+                `;
+
+                if (item.temperatura > -15) {
+                    row.style.color = 'red'; 
+                }
+
+                tbody.appendChild(row);
+            });
+        }
+    })
+    .catch(error => {
+        console.error('Houve um erro ao capturar os dados dos Caminhões!', error);
+    });
+});
+
+function formatDate(dateString) {
+    const options = {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        timeZone: 'UTC'
+    };
+    return new Date(dateString).toLocaleDateString('pt-BR', options);
+}
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreezeWay - DashBoard</title>
+    <link rel="stylesheet" href="TesteMenu.css">
+    <script src="../js/alerta.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,100,0,0" />
+    <link rel="shortcut icon" href="../img/Logo FreezeWay logo branca sem fundo.png" type="image/x-icon">
+    <style>
+        canvas {
+            -moz-user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body onload="obterDadosGrafico()">
+    <div class="navigation">
+        <ul>
+            <li class="list">
+                <span class="title"
+                    style="color: skyblue; font-size: x-large; text-align: center;padding-left: 70px;">FreezeWay</span>
+            </li>
+            <li>
+                <span class="title"
+                    style="color: white; font-size: large; text-align: center;padding-left: 70px;">Olá,&nbsp;&nbsp;<span
+                        id="b_usuario">Usuário</span>!</span>
+            </li><br>
+            <li class="list">
+                <a href="DashPesquisa.html">
+                    <span class="icon"><ion-icon name="search-outline"></ion-icon></span>
+                    <span class="title">Pesquisa</span>
+                </a>
+            </li>
+            <li class="list active">
+                <a href="#">
+                    <span class="icon"><ion-icon name="thermometer-outline"></ion-icon></span>
+                    <span class="title">Temperatura Atual</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashTemSemanal.html">
+                    <span class="icon"> <ion-icon name="stats-chart-outline"></ion-icon></span>
+                    <span class="title">Temperatura Semanal</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashTempAnual.html">
+                    <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+                    <span class="title">Temperatura Mensal</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashCadastroCaminhao.html">
+                    <span class="icon"><ion-icon name="duplicate-outline"></ion-icon></span>
+                    <span class="title">Cadastrar Caminhão</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="../LoginN3.html">
+                    <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+                    <span class="title">FreezeIA</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                    <span class="title">Sair</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="body">
+        <h1>Captura da Temperatura Atual</h1>
+        <div class="canva">
+            <canvas id="myChartCanvas" class="canvas-container" style="width: 60%;height: 40%;"></canvas>
+        </div>
+        <div class="area-parametros-alerta" style="display: flex;justify-content: end;align-items: center;">
+            <p id="titulo-legenda">
+                Alerta
+            </p>
+            <div class="parametros-alerta">
+                <div id="perigoFrio">
+                    <p>Congelada</p>
+                    <p>&lt;= -25°C</p>
+                </div>
+                <div id="alertaFrio">
+                    <p>Boa</p>
+                    <p>&lt;= -20°C</p>
+                </div>
+                <div id="ideal">
+                    <p>Ideal</p>
+                    <p>-16°C</p>
+                </div>
+                <div id="alertaQuente">
+                    <p>Atenção</p>
+                    <p>&gt;= -15°C</p>
+                </div>
+                <div id="alertaPerigo">
+                    <p>Perigo</p>
+                    <p>&gt;= -10°C</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        console.log('Script carregado');
+
+        window.onload(obterDadosGrafico)
+
+        b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+        let chartInstance = null;
+        let proximaAtualizacao;
+
+
+        function obterDadosGrafico() {
+            const Id_usuario = Number(sessionStorage.ID_USUARIO);
+            fetch(`/medidas/ultimas/${Id_usuario}`, { cache: 'no-store' })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Nenhum dado encontrado ou erro na API');
+                    }
+                })
+                .then(function (resposta) {
+                    console.log(resposta);
+                    plotarGrafico(resposta);
+                })
+                .catch(function (error) {
+                    console.error(`Erro na obtenção dos dados para o gráfico: ${error.message}`);
+                });
+        }
+
+        function plotarGrafico(resposta) {
+            const ctx = document.getElementById('myChartCanvas').getContext('2d');
+
+            if (resposta.length === 0) {
+                console.error('Resposta da API vazia');
+                return;
+            }
+
+            const temperaturas = resposta.map(item => parseFloat(item.temperatura)); // Garantir que seja número
+            const labels = resposta.map(item => moment(item.momento_grafico, 'HH:mm:ss').format('HH:mm:ss'));
+
+            if (chartInstance !== null) {
+                chartInstance.destroy();
+            }
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Temperatura',
+                        data: temperaturas,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'second',
+                                parser: 'HH:mm:ss',
+                                tooltipFormat: 'HH:mm:ss',
+                                displayFormats: {
+                                    second: 'HH:mm:ss'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Hora'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Temperatura (°C)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            proximaAtualizacao = setTimeout(() => atualizarGrafico(Number(sessionStorage.ID_USUARIO), chartInstance), 2000);
+        }
+
+
+        function atualizarGrafico(idUsuario, myChart) {
+            fetch(`/medidas/ultimas/${idUsuario}`, { cache: 'no-store' })
+                .then(function (response) {
+                    if (response.ok) {
+                        return response.json();
+                    } else {
+                        throw new Error('Nenhum dado encontrado ou erro na API');
+                    }
+                })
+                .then(function (novoRegistro) {
+                    console.log(`Dados recebidos: ${JSON.stringify(novoRegistro)}`);
+
+                    if (Number(novoRegistro[0].temperatura) > -20.0) {
+                        console.log('Teste: ', novoRegistro[0].temperatura)
+                    }
+
+
+                    if (novoRegistro.length > 0) {
+                        const novoDado = novoRegistro[0];
+                        const ultimoDado = myChart.data.labels[myChart.data.labels.length - 1];
+
+                        if (novoDado.momento_grafico !== ultimoDado) {
+                            myChart.data.labels.push(novoDado.momento_grafico);
+                            myChart.data.datasets[0].data.push(parseFloat(novoDado.temperatura));
+
+                            // Remover o primeiro elemento se o comprimento dos dados exceder 7
+                            if (myChart.data.labels.length > 7) {
+                                myChart.data.labels.shift();
+                                myChart.data.datasets[0].data.shift();
+                            }
+
+                            myChart.update();
+                        }
+                    }
+
+                    proximaAtualizacao = setTimeout(() => atualizarGrafico(idUsuario, myChart), 5000);
+                    alerta(novoRegistro);
+                })
+                .catch(function (error) {
+                    console.error(`Erro na obtenção dos dados p/ gráfico: ${error.message}`);
+                    proximaAtualizacao = setTimeout(() => atualizarGrafico(idUsuario, myChart), 5000);
+                });
+        }
+
+        function alerta(novoRegistro) {
+            for (var i = 0; i < novoRegistro.length; i++) {
+                var dadoGrafico = Number(novoRegistro[i].temperatura);
+                if (dadoGrafico > -15 && dadoGrafico < -10) {
+                    alertaPerigo.style.backgroundColor = "transparent";
+                    alertaQuente.style.backgroundColor = "#f8ca25c7";
+                } else if (dadoGrafico >= -10) {
+                    alertaPerigo.style.backgroundColor = "#FF0000";
+                    alertaQuente.style.backgroundColor = "transparent";
+
+                } else if (dadoGrafico <= 15) {
+                    alertaQuente.style.backgroundColor = "transparent";
+                    alertaPerigo.style.backgroundColor = "transparent";
+                }
+
+            }
+        }
+    </script>
+</body>
+
+</html>

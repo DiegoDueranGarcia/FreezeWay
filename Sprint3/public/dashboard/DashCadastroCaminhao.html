@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="PT-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="TesteMenu.css">
+
+    <title>FreezeWay | Cadastro de Caminhão</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="../js/sessao.js"></script>
+
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,100,0,0" />
+    <link rel="shortcut icon" href="../img/Logo FreezeWay logo branca sem fundo.png" type="image/x-icon">
+    <style>
+        .formCadastro .containercadastro h2 {
+            color: skyblue;
+            font-family: Verdana, Geneva, Tahoma, sans-serif;
+            font-size: 35px;
+            margin-left: 100px;
+        }
+
+        * {
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            font-family: verdana;
+        }
+
+        body {
+            background: white;
+            color: rgb(202, 202, 202);
+        }
+
+        #cadastro {
+            width: 100%;
+            padding: 10px;
+        }
+
+        .containercadastro {
+            background-color: #727272;
+            width: 80%;
+            height: 100%;
+            margin: auto;
+            display: flex;
+            justify-content: flex-end;
+            flex-direction: row;
+            align-items: center;
+            border: 2px solid skyblue;
+            border-radius: 35px;
+        }
+
+        .formCadastro {
+            padding-top: 30px;
+            display: flex;
+            flex-direction: column;
+            width: 500px;
+            margin: auto;
+            justify-content: flex-end;
+            align-items: center;
+        }
+
+        .tituloCadastro {
+            margin-top: 10px;
+        }
+
+
+        .formCadastro .containercadastro .pCadastro {
+            margin-top: 15px;
+            color: skyblue;
+            font-size: larger;
+            font-weight: bold;
+        }
+
+        input {
+            width: 370px;
+            height: 40px;
+            border-radius: 15px;
+            background: transparent;
+            color: #000;
+            transition: 400ms;
+            border: 2px solid skyblue;
+            padding: 10px;
+        }
+
+        input:hover {
+            border: 2px solid skyblue;
+            font-size: 15px;
+        }
+
+        input:focus {
+            outline: 0;
+            border: 2px solid skyblue;
+        }
+
+        button {
+            width: 250px;
+            border-radius: 15px;
+            margin-left: 70px;
+            height: 40px;
+            background: skyblue;
+            color: #424244;
+            font-size: 20px;
+            cursor: pointer;
+            transition: 400ms;
+            border: none;
+        }
+
+        button:hover {
+            background: rgb(0, 183, 255);
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="navigation">
+        <ul>
+            <li class="list">
+                <span class="title"
+                    style="color: skyblue; font-size: x-large; text-align: center;padding-left: 70px;">FreezeWay</span>
+            </li>
+            <li>
+                <span class="title"
+                    style="color: white; font-size: large; text-align: center;padding-left: 70px;">Olá,&nbsp;&nbsp;<span
+                        id="b_usuario">Usuário</span>!</span>
+            </li><br>
+            <li class="list">
+                <a href="DashPesquisa.html">
+                    <span class="icon"><ion-icon name="search-outline"></ion-icon></span>
+                    <span class="title">Pesquisa</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashFinal.html">
+                    <span class="icon"><ion-icon name="thermometer-outline"></ion-icon></span>
+                    <span class="title">Temperatura Atual</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashTemSemanal.html">
+                    <span class="icon"> <ion-icon name="stats-chart-outline"></ion-icon></span>
+                    <span class="title">Temperatura Semanal</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="DashTempAnual.html">
+                    <span class="icon"><ion-icon name="bar-chart-outline"></ion-icon></span>
+                    <span class="title">Temperatura Mensal</span>
+                </a>
+            </li>
+            <li class="list active">
+                <a href="DashCadastroCaminhao.html">
+                    <span class="icon"><ion-icon name="duplicate-outline"></ion-icon></span>
+                    <span class="title">Cadastrar Caminhão</span>
+                </a>
+            </li>
+            <li class="list">
+                <a href="../LoginN3.html">
+                    <span class="icon"><ion-icon name="person-outline"></ion-icon></span>
+                    <span class="title">FreezeIA</span>
+                </a>
+            </li>
+            <li class="list">
+                <a>
+                    <span class="icon"><ion-icon name="log-out-outline"></ion-icon></span>
+                    <span class="title"><button class="logout" onclick="limparSessao()"> Sair</button></span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="formCadastro">
+        <div class="containercadastro">
+            <div id="cadastro">
+                <div id="title">
+                    <h2 class="tituloCadastro">Cadastrar Caminhão</h2>
+                </div>
+                <p class="pCadastro">Motorista</p>
+                <input type="text" id="input_Motorista" placeholder="Insira o nome do Motorista Atual:">
+
+                <p class="pCadastro">Placa</p>
+                <input type="text" id="input_Placa" placeholder="Insira a placa do caminhão:">
+                <br><br>
+                <p class="pCadastro">Produto</p>
+                <input type="text" id="input_Produto" placeholder="Insira qual produto irá transportar:">
+                <p class="pCadastro">Quantidade do Produto</p>
+                <input type="text" id="input_QtdProd" placeholder="Insira a Quantidade do produto irá transportar:">
+                <br><br>
+                <button onclick="cadastrarCaminhao()">Cadastrar Caminhão</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
+
+<script>
+    b_usuario.innerHTML = sessionStorage.NOME_USUARIO;
+    var idUsuarioVar = sessionStorage.ID_USUARIO;
+
+    function cadastrarCaminhao() {
+
+        var motoristaVar = input_Motorista.value;
+        var placaVar = input_Placa.value;
+        var QtdProdutoVar = input_QtdProd.value;
+
+        var produtoVar = input_Produto.value;
+        var idUsuarioVar = sessionStorage.ID_USUARIO;
+
+        if (motoristaVar == "" || placaVar == "" || produtoVar == "" || QtdProdutoVar == "") {
+            alert("Mensagem de erro para todos os campos em branco");
+
+            return false;
+        } else if (motoristaVar.length < 3) {
+            alert("Dados inseridos incorretamente, Por Favor, Corrija Seu Nome.")
+        } else if (placaVar.length > 7 || placaVar.length < 7) {
+            alert("Dados inseridos incorretamente, Por Favor, Corrija Sua Placa.\n Ela Deve Conter exatamente 7 Digitos")
+        } else {
+
+            fetch("/Caminhao/cadastrarCaminhao", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+
+                    motoristaServer: motoristaVar,
+                    placaServer: placaVar,
+                    produtoServer: produtoVar,
+                    QtdProdutoServer: QtdProdutoVar,
+                    idUsuarioServer: idUsuarioVar
+                }),
+            })
+                .then(function (resposta) {
+                    console.log("resposta: ", resposta);
+
+                    if (resposta.ok) {
+                        alert("Caminhão Cadastrado com sucesso!")
+                        window.location = "./DashPesquisa.html";
+
+                    } else {
+                        throw "Houve um erro ao tentar realizar o cadastro!";
+                    }
+                })
+                .catch(function (resposta) {
+                    console.log(`#ERRO: ${resposta}`);
+                    // finalizarAguardar();
+                });
+
+            return false;
+        }
+    }
+
+</script>
